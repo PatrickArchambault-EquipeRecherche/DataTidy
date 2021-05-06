@@ -19,3 +19,13 @@ import sys
 import re
 import datetime
 import csv
+import pandas
+
+# Start by pulling in the Parameter file.  By default this will be 
+# 'parameters.csv', but should eventually be specifiable on the command 
+# line.
+
+def dateCheck(myDateString):
+    # Parse the date using the datetime tools, the put the date into the
+    # format needed for consistency, adding an Error Value if the parsing
+    # fails and a default value if there is nothing in the cell.
