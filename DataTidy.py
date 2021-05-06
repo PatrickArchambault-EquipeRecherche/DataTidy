@@ -25,7 +25,7 @@ import pandas
 
 def dateCheck(myDateString):
     # Parse the date using the datetime tools, the put the date into the
-    # format needed for consistency, adding an Error Value if the parsing
+    # format needed for consistency, returning an error if the parsing
     # fails and a default value if there is nothing in the cell.
     pass
 
@@ -53,11 +53,14 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
         myDateTimeString = datetime.datetime.now().strftime("%Y%m%d%H%M")
 
         with open(myDateTimeString + "tidyData.csv" , "w+" , newline='') as outputfile:
-
+            # Create a csv object
+            processedOutput = csv.writer(outputfile)
             # Finally, we create a file for rows that are outliers in some way.
 
             with open(myDateTimeString + "outliers.csv" , "w+" , newline='') as outlierfile:
+                # Create a csv object for the outliers
+                myOutliers = csv.writer(outlierfile)
                 
                 for row in sourceReader:
-                    outputfile.writerow(row)
+                    processedOutput.writerow(row)
 
