@@ -52,7 +52,7 @@ with open('parameters.csv', newline='') as parametersfile:
         # given minute.
         myDateTimeString = datetime.datetime.now().strftime("%Y%m%d%H%M")
 
-        with open(myDateTimeString + "tidyData.csv" , newline='') as outputfile:
+        with open(myDateTimeString + "tidyData.csv" , "w+" , newline='') as outputfile:
             for row in sourceReader:
                 outputfile.writerow(row)
 
