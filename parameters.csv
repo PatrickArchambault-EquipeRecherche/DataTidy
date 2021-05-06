@@ -1,6 +1,6 @@
-"Column Name",
-"Data Type",
-"New Name",
-"Default Value",
-"Error Value",
-"Format",
+"Column Name",SecretID,Date,FirstName,LastName,Number,ConstrainedNumber
+"Data Type",number,date,string,string,number,number
+"New Name",,,,,,
+"Default Value",,,,,,9999
+"Format",\d\d\d\d*,%Y-%m-%d,,,,\d
+"Acceptable Range",,,,,,"0,10"
