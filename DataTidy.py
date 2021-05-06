@@ -33,13 +33,13 @@ def dateCheck(myDateString):
 # 'parameters.csv', but should eventually be specifiable on the command 
 # line.
 
-with open('parameters.csv', newline='') as parametersfile:
+with open('parameters.csv' , "r" , newline='') as parametersfile:
     parameterReader =  pandas.read_csv(parametersfile)
 
     # Next open the source datafile.  By default this will be 'source.csv' 
     # but should be specifiable on the command line.
 
-    with open('source.csv', newline='') as sourcefile:
+    with open('source.csv' , "r" , newline='') as sourcefile:
         sourceReader = csv.reader(sourcefile)
 
         # Next, open the destination file.  Having all of these files 
@@ -54,7 +54,10 @@ with open('parameters.csv', newline='') as parametersfile:
 
         with open(myDateTimeString + "tidyData.csv" , "w+" , newline='') as outputfile:
 
-            # Finally, we create a file for rows that are wonky in 
-            for row in sourceReader:
-                outputfile.writerow(row)
+            # Finally, we create a file for rows that are outliers in some way.
+
+            with open(myDateTimeString + "outliers.csv" , "w+" , newline='') as outlierfile:
+                
+                for row in sourceReader:
+                    outputfile.writerow(row)
 
