@@ -42,7 +42,7 @@ with open('parameters.csv', newline='') as parametersfile:
     with open('source.csv', newline='') as sourcefile:
         sourceReader = csv.reader(sourcefile)
 
-        # Finally, open the destination file.  Having all of these files 
+        # Next, open the destination file.  Having all of these files 
         # open at once ensures that we break on missing or misnamed files 
         # right away, and lets use read and write only one file at a 
         # time, keeping the memory needs very low and the number of times 
@@ -53,6 +53,8 @@ with open('parameters.csv', newline='') as parametersfile:
         myDateTimeString = datetime.datetime.now().strftime("%Y%m%d%H%M")
 
         with open(myDateTimeString + "tidyData.csv" , "w+" , newline='') as outputfile:
+
+            # Finally, we create a file for rows that are wonky in 
             for row in sourceReader:
                 outputfile.writerow(row)
 
