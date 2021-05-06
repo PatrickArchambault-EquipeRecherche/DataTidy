@@ -41,6 +41,7 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
 
     with open('source.csv' , "r" , newline='') as sourcefile:
         sourceReader = csv.reader(sourcefile)
+        header = next(sourceReader)
 
         # Next, open the destination file.  Having all of these files 
         # open at once ensures that we break on missing or misnamed files 
@@ -52,7 +53,7 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
         # given minute.
         myDateTimeString = datetime.datetime.now().strftime("%Y%m%d%H%M")
 
-        with open(myDateTimeString + "tidyData.csv" , "w+" , newline='') as outputfile:
+        with open(myDateTimeString + "tidyData.csv" , "a+" , newline='') as outputfile:
             # Create a csv object
             processedOutput = csv.writer(outputfile)
             # Finally, we create a file for rows that are outliers in some way.
@@ -61,6 +62,11 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                 # Create a csv object for the outliers
                 myOutliers = csv.writer(outlierfile)
                 
+                #debug print(header)
+                processedOutput.writerow(header)
                 for row in sourceReader:
+                    updatedRow = []
+                    for cell in row:
+                        updatedRow.append(cell)
                     processedOutput.writerow(row)
 
