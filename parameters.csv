@@ -2,5 +2,6 @@
 "Data Type",number,date,string,string,number,number
 "New Name",SecretID1,,,,NewNumber,
 "Default Value",,,,,,9999
-"Format",\d\d\d\d*,%Y-%m-%d,,,,\d
+"Base Format",\d\d\d\d,%d-%m-%Y,,,,\d
+"Desired Format",,%Y-%m-%d,,,,
 "Acceptable Range",,,,,,"0,10"
