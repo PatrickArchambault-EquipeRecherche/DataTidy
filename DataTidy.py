@@ -16,6 +16,7 @@
 # who lack programming training.
 
 import sys
+import os
 import re
 import datetime
 import csv
@@ -23,11 +24,22 @@ import pandas
 
 # Following are the base validation functions
 
-def dateCheck(myDateString):
+def dateCheck(myDateString,baseFormat,desiredFormat):
     # Parse the date using the datetime tools, the put the date into the
     # format needed for consistency, returning an error if the parsing
-    # fails and a default value if there is nothing in the cell.
-    pass
+    # fails.
+    print(myDateString + " " + baseFormat)
+    try:
+        myDate = datetime.datetime.strptime(myDateString, baseFormat)
+        print(myDate)
+        cleanDate = datetime.datetime.strftime(myDate, desiredFormat)
+        print(cleanDate)
+
+        return cleanDate
+    except:
+        return "Date error"
+
+#debug print(dateCheck("23-04-2021", "%d-%m-%Y", "%Y/%m/%d"))
 
 # Start by pulling in the Parameter file.  By default this will be 
 # 'parameters.csv', but should eventually be specifiable on the command 
@@ -71,7 +83,12 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                 processedOutput.writerow(header)
                 for row in sourceReader:
                     updatedRow = []
-                    for cell in row:
-                        updatedRow.append(cell)
-                    processedOutput.writerow(row)
+                    for i in range(len(row)):
+                        #print(parameterDataframe.at['Data Type',i+1])
+                        updatedRow.append(row[i])
+                    processedOutput.writerow(updatedRow)
+
+            # Cleanup code - if the outliers file is empty, delete it
+            if os.path.exists(outlierfile.name) and os.stat(outlierfile.name).st_size == 0:
+                os.remove(outlierfile.name)
 
