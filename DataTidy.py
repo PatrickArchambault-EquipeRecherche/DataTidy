@@ -34,7 +34,7 @@ def dateCheck(myDateString):
 # line.
 
 with open('parameters.csv' , "r" , newline='') as parametersfile:
-    parameterReader =  pandas.read_csv(parametersfile)
+    parameterDataframe =  pandas.read_csv(parametersfile)
 
     # Next open the source datafile.  By default this will be 'source.csv' 
     # but should be specifiable on the command line.
@@ -62,7 +62,13 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                 # Create a csv object for the outliers
                 myOutliers = csv.writer(outlierfile)
                 
-                #debug print(header)
+                # Check the "New Name" row in the paramters file, and if 
+                # any columns need to be renamed, do that here.
+                
+                parameterDataframe
+                #header = [parameterDataframe.loc['New Name',i] if parameterDataframe.loc['New Name',i] else i for i in header]
+                print(header)
+
                 processedOutput.writerow(header)
                 for row in sourceReader:
                     updatedRow = []
