@@ -21,6 +21,7 @@ import re
 import datetime
 import csv
 import pandas
+import numpy
 
 # Following are the base validation functions
 
@@ -77,16 +78,41 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                 # Check the "New Name" row in the paramters file, and if 
                 # any columns need to be renamed, do that here.
                 
-                header = [parameterDataframe.at['New Name',i] if pandas.notnull(parameterDataframe.at['New Name',i]) else i for i in header]
+                newHeader = [parameterDataframe.at['New Name',i] if pandas.notnull(parameterDataframe.at['New Name',i]) else i for i in header]
                 #print(header)
 
-                processedOutput.writerow(header)
+                processedOutput.writerow(newHeader)
                 for row in sourceReader:
+                    # We need to put the changed values into a new row.
+                    # Here's the list for that:
                     updatedRow = []
+                    # Set a flag for catching errors.  We can set this 
+                    # lots of times, because any value over zero 
+                    # triggers putting this row into the outliers file.
+                    is_wrong_somehow = 0
+                    
                     for i in range(len(row)):
-                        #print(parameterDataframe.at['Data Type',i+1])
+                        # Here is where we do all of the data validation and reformatting.
+                        if parameterDataframe.at["Data Type" , header[i]] == "number":
+                            if numpy.char.isnumeric(row[i]):
+                                pass
+                            else:
+                                is_wrong_somehow = is_wrong_somehow + 1
+                        elif parameterDataframe.at["Data Type" , header[i]] == "date":
+                            pass
+                        elif parameterDataframe.at["Data Type" , header[i]] == "string":
+                            pass
+                        else:
+                            is_wrong_somehow = is_wrong_somehow + 1
+
                         updatedRow.append(row[i])
-                    processedOutput.writerow(updatedRow)
+                    
+                    # check the error flag value, and write out the row to
+                    # either the outliers file or the output file.
+                    if (is_wrong_somehow > 0):
+                        myOutliers.writerow(row)
+                    else:
+                        processedOutput.writerow(updatedRow)
 
             # Cleanup code - if the outliers file is empty, delete it
             if os.path.exists(outlierfile.name) and os.stat(outlierfile.name).st_size == 0:
