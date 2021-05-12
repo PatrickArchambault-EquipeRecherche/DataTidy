@@ -30,12 +30,12 @@ def dateCheck(myDateString,baseFormat,desiredFormat):
     # Parse the date using the datetime tools, the put the date into the
     # format needed for consistency, returning an error if the parsing
     # fails.
-    print(myDateString + " " + baseFormat)
+    #print(myDateString + " " + baseFormat)
     try:
         myDate = datetime.datetime.strptime(myDateString, baseFormat)
-        print(myDate)
+        #print(myDate)
         cleanDate = datetime.datetime.strftime(myDate, desiredFormat)
-        print(cleanDate)
+        #print(cleanDate)
 
         return cleanDate
     except:
@@ -114,6 +114,7 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                                     
                                     pass
                                 else:
+                                    #print("Error in pattern match of the base format: " + cell)
                                     is_wrong_somehow = is_wrong_somehow + 1
                             else:
                                 pass
@@ -124,13 +125,22 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                                     
                                     pass
                                 else:
+                                    #print("Error in pattern match of the desired format: " + cell)
                                     is_wrong_somehow = is_wrong_somehow + 1
                             else:
                                 pass
                             
                         elif parameterDataframe.at["Data Type" , header[i]] == "string":
                             pass
+                        elif parameterDataframe.at["Data Type" , header[i]] == "date":
+                            checkedDate = dateCheck(cell , parameterDataframe.at['Base Format' , header[i]] , parameterDataframe.at['Desired Format' , header[i]])
+                            if checkedDate == "Date Error":
+                                #print("Error in date format: " + cell)
+                                is_wrong_somehow = is_wrong_somehow +1
+                            else:
+                                cell = checkedDate
                         else:
+                            print("This cell fell through the cracks all the way to the bottom: " + cell)
                             is_wrong_somehow = is_wrong_somehow + 1
 
                         updatedRow.append(cell)
