@@ -92,10 +92,28 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                     is_wrong_somehow = 0
                     
                     for i in range(len(row)):
-                        # Here is where we do all of the data validation and reformatting.
+                        # Here is where we do all of the data validation
+                        # and reformatting.
+
+                        #Set a cell variable equal to the cell we pull 
+                        # from the source data, so that manipulate (or 
+                        # not) that value and put it into our temporary 
+                        # row
+
+                        cell = row[i]
+
                         if parameterDataframe.at["Data Type" , header[i]] == "number":
-                            if numpy.char.isnumeric(row[i]):
-                                pass
+                            # Canary here for number
+                            #print("this is a number")
+                            print(type(cell))
+                            if type(cell) == "float":
+                                print("float")
+                                if pandas.notnull(parameterDataframe.at['Desired Format' , header[i]]):
+                                    # Coerce the number into the defined format
+                                    cell = parameterDataframe.at['Desired Format' , header[i]].format(cell)
+                                    print(cell)
+                                else:
+                                    cell = parameterDataframe.at['Desired Format' , header[i]].format(cell)
                             else:
                                 is_wrong_somehow = is_wrong_somehow + 1
                         elif parameterDataframe.at["Data Type" , header[i]] == "date":
@@ -105,7 +123,7 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                         else:
                             is_wrong_somehow = is_wrong_somehow + 1
 
-                        updatedRow.append(row[i])
+                        updatedRow.append(cell)
                     
                     # check the error flag value, and write out the row to
                     # either the outliers file or the output file.
