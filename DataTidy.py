@@ -22,6 +22,7 @@ import datetime
 import csv
 import pandas
 import numpy
+from pandas.core.dtypes.missing import notnull
 
 # Following are the base validation functions
 
@@ -105,19 +106,28 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                         if parameterDataframe.at["Data Type" , header[i]] == "number":
                             # Canary here for number
                             #print("this is a number")
-                            print(type(cell))
-                            if type(cell) == "float":
-                                print("float")
-                                if pandas.notnull(parameterDataframe.at['Desired Format' , header[i]]):
-                                    # Coerce the number into the defined format
-                                    cell = parameterDataframe.at['Desired Format' , header[i]].format(cell)
-                                    print(cell)
+
+                            # If there is a base format defined, check if the data conforms and throw a flag if not
+                            if pandas.notnull(parameterDataframe.at['Base Format' , header[i]]):
+                                # Check if the cell conforms to the defined format
+                                if re.fullmatch(parameterDataframe.at['Base Format' , header[i]] , cell):
+                                    
+                                    pass
                                 else:
-                                    cell = parameterDataframe.at['Desired Format' , header[i]].format(cell)
+                                    is_wrong_somehow = is_wrong_somehow + 1
                             else:
-                                is_wrong_somehow = is_wrong_somehow + 1
-                        elif parameterDataframe.at["Data Type" , header[i]] == "date":
-                            pass
+                                pass
+                            # If there is a desired format defined, check if the data conforms and throw a flag if not
+                            if pandas.notnull(parameterDataframe.at['Desired Format' , header[i]]):
+                                # Check if the cell conforms to the defined format
+                                if re.fullmatch(parameterDataframe.at['Desired Format' , header[i]] , cell):
+                                    
+                                    pass
+                                else:
+                                    is_wrong_somehow = is_wrong_somehow + 1
+                            else:
+                                pass
+                            
                         elif parameterDataframe.at["Data Type" , header[i]] == "string":
                             pass
                         else:
