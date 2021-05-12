@@ -134,7 +134,7 @@ with open('parameters.csv' , "r" , newline='') as parametersfile:
                             pass
                         elif parameterDataframe.at["Data Type" , header[i]] == "date":
                             checkedDate = dateCheck(cell , parameterDataframe.at['Base Format' , header[i]] , parameterDataframe.at['Desired Format' , header[i]])
-                            if checkedDate == "Date Error":
+                            if checkedDate == "Date error":
                                 #print("Error in date format: " + cell)
                                 is_wrong_somehow = is_wrong_somehow +1
                             else:
