@@ -24,6 +24,15 @@ import pandas
 import numpy
 from pandas.core.dtypes.missing import notnull
 
+# Grab the source and the parameters files from the command line
+
+if len(sys.argv) == 3:
+    mySourceFile = sys.argv[1]
+    myParameterFile = sys.argv[2]
+else:
+    mySourceFile = "source.csv"
+    myParameterFile = "parameters.csv"
+
 # Following are the base validation functions
 
 def dateCheck(myDateString,baseFormat,desiredFormat):
@@ -47,13 +56,13 @@ def dateCheck(myDateString,baseFormat,desiredFormat):
 # 'parameters.csv', but should eventually be specifiable on the command 
 # line.
 
-with open('parameters.csv' , "r" , newline='') as parametersfile:
+with open(myParameterFile , "r" , newline='') as parametersfile:
     parameterDataframe =  pandas.read_csv(parametersfile, index_col=0)
 
     # Next open the source datafile.  By default this will be 'source.csv' 
     # but should be specifiable on the command line.
 
-    with open('source.csv' , "r" , newline='') as sourcefile:
+    with open(mySourceFile , "r" , newline='') as sourcefile:
         sourceReader = csv.reader(sourcefile)
         header = next(sourceReader)
 
