@@ -30,6 +30,7 @@ if len(sys.argv) == 3:
     mySourceFile = sys.argv[1]
     myParameterFile = sys.argv[2]
 else:
+    # We want hard-coded values for testing, as a fall-back.
     mySourceFile = "source.csv"
     myParameterFile = "parameters.csv"
 
