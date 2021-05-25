@@ -27,7 +27,6 @@
 
 import sys
 import os
-import re
 import datetime
 import csv
 import pandas
@@ -64,27 +63,23 @@ def dateCheck(myDateString, baseFormat, desiredFormat):
 
 # Check numbers
 
-def numberCheck(myNumber, baseFormat=".*", desiredFormat=".*"):
+def numberCheck(myNumber, baseFormat, desiredFormat):
     '''Check the value to see if it is an integer.'''
     # Canary here, show the arguments
     #print("Number: " + str(myNumber) + " Base Format: " + str(baseFormat) + " Desired Format: " + str(desiredFormat))
 
     if myNumber.isdigit():
-        pass
+        # Canary here, checking number characteristics
+        #print(type(myNumber))
+        #print(myNumber)
         
-        if baseFormat:
-            if re.fullmatch(str(baseFormat), myNumber):
-                pass
-            else:
-                return "Base format error"
+        if baseFormat == "":
+            print("No base format provided")
         else:
             pass
         
-        if desiredFormat:
-            if re.fullmatch(str(desiredFormat), myNumber):
-                pass
-            else:
-                return "Desired format error"
+        if desiredFormat == "":
+            print("No desired format provided")
         else:
             pass
 
@@ -159,11 +154,18 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                             
                             # Now we send the number and the format information to checkNumber()
                             checkedNumber = numberCheck(cell, parameterDataframe.at['Base Format' , header[i]], parameterDataframe.at['Desired Format' , header[i]])
-                            if checkedNumber == "Number error":
+                            if checkedNumber == "Failed isdigit error":
+                                #print("Error in number format: " + cell)
+                                is_wrong_somehow = is_wrong_somehow +1
+                            elif checkedNumber == "Base format error":
+                                #print("Error in number format: " + cell)
+                                is_wrong_somehow = is_wrong_somehow +1
+                            elif checkedNumber == "Desired format error":
                                 #print("Error in number format: " + cell)
                                 is_wrong_somehow = is_wrong_somehow +1
                             else:
                                 cell = checkedNumber
+
                         elif parameterDataframe.at["Data Type" , header[i]] == "ConstrainedNumber":
                             pass
                             
