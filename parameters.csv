@@ -1,5 +1,5 @@
 "Column Name",SecretID,Date,FirstName,LastName,Number,ConstrainedNumber
-"Data Type",number,date,string,string,number,number
+"Data Type",string,date,string,string,number,number
 "New Name",SecretID1,,,,NewNumber,
 "Default Value",,,,,,9999
 "Base Format",\d\d\d\d,%d-%m-%Y,,,,\d

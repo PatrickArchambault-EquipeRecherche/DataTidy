@@ -15,14 +15,22 @@
 # program is that it can be easily read, changed, and written by researchers
 # who lack programming training.
 
+# The "Data Type" row of the parameters file drives the types of validation.
+# There are four (4) permitted values so far:
+
+# "integer" - this means that the column should be tested as natural numbers
+# "number"  - this is most other kinds of number
+# "date"    - this is a date or date and time - a format will be needed
+# "string"  - this is text of some kind
+
+# We are using the "pandera" package to do validation.
+
 import sys
 import os
 import re
 import datetime
 import csv
 import pandas
-import numpy
-from pandas.core.dtypes.missing import notnull
 
 # Grab the source and the parameters files from the command line
 
@@ -36,10 +44,11 @@ else:
 
 # Following are the base validation functions
 
-def dateCheck(myDateString,baseFormat,desiredFormat):
-    # Parse the date using the datetime tools, the put the date into the
-    # format needed for consistency, returning an error if the parsing
-    # fails.
+# Check dates
+def dateCheck(myDateString, baseFormat, desiredFormat):
+    '''Parse the date using the datetime tools, the put the date into the
+    format needed for consistency, returning an error if the parsing
+    fails.'''
     #print(myDateString + " " + baseFormat)
     try:
         myDate = datetime.datetime.strptime(myDateString, baseFormat)
@@ -52,6 +61,37 @@ def dateCheck(myDateString,baseFormat,desiredFormat):
         return "Date error"
 
 #debug print(dateCheck("23-04-2021", "%d-%m-%Y", "%Y/%m/%d"))
+
+# Check numbers
+
+def numberCheck(myNumber, baseFormat=".*", desiredFormat=".*"):
+    '''Check the value to see if it is an integer.'''
+    # Canary here, show the arguments
+    #print("Number: " + str(myNumber) + " Base Format: " + str(baseFormat) + " Desired Format: " + str(desiredFormat))
+
+    if myNumber.isdigit():
+        pass
+        
+        if baseFormat:
+            if re.fullmatch(str(baseFormat), myNumber):
+                pass
+            else:
+                return "Base format error"
+        else:
+            pass
+        
+        if desiredFormat:
+            if re.fullmatch(str(desiredFormat), myNumber):
+                pass
+            else:
+                return "Desired format error"
+        else:
+            pass
+
+        return myNumber
+
+    else:
+        return "Failed isdigit error"    
 
 # Start by pulling in the Parameter file.  By default this will be 
 # 'parameters.csv', but should eventually be specifiable on the command 
@@ -116,32 +156,20 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                         if parameterDataframe.at["Data Type" , header[i]] == "number":
                             # Canary here for number
                             #print("this is a number")
-
-                            # If there is a base format defined, check if the data conforms and throw a flag if not
-                            if pandas.notnull(parameterDataframe.at['Base Format' , header[i]]):
-                                # Check if the cell conforms to the defined format
-                                if re.fullmatch(parameterDataframe.at['Base Format' , header[i]] , cell):
-                                    
-                                    pass
-                                else:
-                                    #print("Error in pattern match of the base format: " + cell)
-                                    is_wrong_somehow = is_wrong_somehow + 1
+                            
+                            # Now we send the number and the format information to checkNumber()
+                            checkedNumber = numberCheck(cell, parameterDataframe.at['Base Format' , header[i]], parameterDataframe.at['Desired Format' , header[i]])
+                            if checkedNumber == "Number error":
+                                #print("Error in number format: " + cell)
+                                is_wrong_somehow = is_wrong_somehow +1
                             else:
-                                pass
-                            # If there is a desired format defined, check if the data conforms and throw a flag if not
-                            if pandas.notnull(parameterDataframe.at['Desired Format' , header[i]]):
-                                # Check if the cell conforms to the defined format
-                                if re.fullmatch(parameterDataframe.at['Desired Format' , header[i]] , cell):
-                                    
-                                    pass
-                                else:
-                                    #print("Error in pattern match of the desired format: " + cell)
-                                    is_wrong_somehow = is_wrong_somehow + 1
-                            else:
-                                pass
+                                cell = checkedNumber
+                        elif parameterDataframe.at["Data Type" , header[i]] == "ConstrainedNumber":
+                            pass
                             
                         elif parameterDataframe.at["Data Type" , header[i]] == "string":
                             pass
+
                         elif parameterDataframe.at["Data Type" , header[i]] == "date":
                             checkedDate = dateCheck(cell , parameterDataframe.at['Base Format' , header[i]] , parameterDataframe.at['Desired Format' , header[i]])
                             if checkedDate == "Date error":
