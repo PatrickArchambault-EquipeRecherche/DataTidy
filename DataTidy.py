@@ -27,9 +27,11 @@
 
 import sys
 import os
+import re
 import datetime
 import csv
 import pandas
+import math
 
 # Grab the source and the parameters files from the command line
 
@@ -44,7 +46,7 @@ else:
 # Following are the base validation functions
 
 # Check dates
-def dateCheck(myDateString, baseFormat, desiredFormat):
+def date_check(myDateString, baseFormat, desiredFormat):
     '''Parse the date using the datetime tools, the put the date into the
     format needed for consistency, returning an error if the parsing
     fails.'''
@@ -61,27 +63,55 @@ def dateCheck(myDateString, baseFormat, desiredFormat):
 
 #debug print(dateCheck("23-04-2021", "%d-%m-%Y", "%Y/%m/%d"))
 
-# Check numbers
+# Basic code checking if the number can be construed as a number at all
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+ 
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+ 
+    return False    
 
-def numberCheck(myNumber, baseFormat, desiredFormat):
-    '''Check the value to see if it is an integer.'''
+# Check numbers
+def number_check(myNumber, baseFormat, desiredFormat):
+    '''Check the value to see if it is an number.'''
     # Canary here, show the arguments
     #print("Number: " + str(myNumber) + " Base Format: " + str(baseFormat) + " Desired Format: " + str(desiredFormat))
 
-    if myNumber.isdigit():
+    if is_number(myNumber):
         # Canary here, checking number characteristics
         #print(type(myNumber))
         #print(myNumber)
         
-        if baseFormat == "":
-            print("No base format provided")
-        else:
+        try:
+            math.isnan(baseFormat)
             pass
+        except:
+            # We have a base format - now we have to test against it
+            #print(baseFormat)
+            if re.fullmatch(baseFormat, myNumber):
+                pass
+            else:
+                return "Base format error"
         
-        if desiredFormat == "":
-            print("No desired format provided")
-        else:
+        try:
+            math.isnan(desiredFormat)
             pass
+        except:
+            # We have a desired format - now we have to test against it
+            #print(desiredFormat)
+            if re.fullmatch(desiredFormat, myNumber):
+                pass
+            else:
+                return "Desired format error"
 
         return myNumber
 
@@ -89,8 +119,7 @@ def numberCheck(myNumber, baseFormat, desiredFormat):
         return "Failed isdigit error"    
 
 # Start by pulling in the Parameter file.  By default this will be 
-# 'parameters.csv', but should eventually be specifiable on the command 
-# line.
+# 'parameters.csv', but it is also specifiable on the command line.
 
 with open(myParameterFile , "r" , newline='') as parametersfile:
     parameterDataframe =  pandas.read_csv(parametersfile, index_col=0)
@@ -153,7 +182,7 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                             #print("this is a number")
                             
                             # Now we send the number and the format information to checkNumber()
-                            checkedNumber = numberCheck(cell, parameterDataframe.at['Base Format' , header[i]], parameterDataframe.at['Desired Format' , header[i]])
+                            checkedNumber = number_check(cell, parameterDataframe.at['Base Format' , header[i]], parameterDataframe.at['Desired Format' , header[i]])
                             if checkedNumber == "Failed isdigit error":
                                 #print("Error in number format: " + cell)
                                 is_wrong_somehow = is_wrong_somehow +1
@@ -173,7 +202,7 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                             pass
 
                         elif parameterDataframe.at["Data Type" , header[i]] == "date":
-                            checkedDate = dateCheck(cell , parameterDataframe.at['Base Format' , header[i]] , parameterDataframe.at['Desired Format' , header[i]])
+                            checkedDate = date_check(cell , parameterDataframe.at['Base Format' , header[i]] , parameterDataframe.at['Desired Format' , header[i]])
                             if checkedDate == "Date error":
                                 #print("Error in date format: " + cell)
                                 is_wrong_somehow = is_wrong_somehow +1
