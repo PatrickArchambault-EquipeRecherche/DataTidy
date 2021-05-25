@@ -194,12 +194,28 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                                 is_wrong_somehow = is_wrong_somehow +1
                             else:
                                 cell = checkedNumber
-
-                        elif parameterDataframe.at["Data Type" , header[i]] == "ConstrainedNumber":
-                            pass
-                            
+                                
                         elif parameterDataframe.at["Data Type" , header[i]] == "string":
-                            pass
+                            if parameterDataframe.at['Base Format' , header[i]]:
+                                try:
+                                    if re.fullmatch(parameterDataframe.at['Base Format' , header[i]] , cell):
+                                        pass
+                                    else:
+                                        #print("Error in string format: " + cell)
+                                        is_wrong_somehow = is_wrong_somehow +1
+                                except:
+                                    pass
+                            elif parameterDataframe.at['Desired Format' , header[i]]:
+                                try:
+                                    if re.fullmatch(parameterDataframe.at['Desired Format' , header[i]] , cell):
+                                        pass
+                                    else:
+                                        #print("Error in string format: " + cell)
+                                        is_wrong_somehow = is_wrong_somehow +1
+                                except:
+                                    pass
+                            else:
+                                pass
 
                         elif parameterDataframe.at["Data Type" , header[i]] == "date":
                             checkedDate = date_check(cell , parameterDataframe.at['Base Format' , header[i]] , parameterDataframe.at['Desired Format' , header[i]])

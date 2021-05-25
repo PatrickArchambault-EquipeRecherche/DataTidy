@@ -4,4 +4,3 @@
 "Default Value",,,,,,9999
 "Base Format",\d\d\d\d,%d-%m-%Y,,,,\d
 "Desired Format",\d\d\d\d,%Y-%m-%d,,,,
-"Acceptable Range",,,,,,"0,10"
