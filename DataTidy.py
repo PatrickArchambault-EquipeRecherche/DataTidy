@@ -16,9 +16,8 @@
 # who lack programming training.
 
 # The "Data Type" row of the parameters file drives the types of validation.
-# There are four (4) permitted values so far:
+# There are three (3) permitted values so far:
 
-# "integer" - this means that the column should be tested as natural numbers
 # "number"  - this is most other kinds of number
 # "date"    - this is a date or date and time - a format will be needed
 # "string"  - this is text of some kind
@@ -116,7 +115,7 @@ def number_check(myNumber, baseFormat, desiredFormat):
         return myNumber
 
     else:
-        return "Failed isdigit error"    
+        return "Failed not a number error"    
 
 # Start by pulling in the Parameter file.  By default this will be 
 # 'parameters.csv', but it is also specifiable on the command line.
@@ -125,7 +124,7 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
     parameterDataframe =  pandas.read_csv(parametersfile, index_col=0)
 
     # Next open the source datafile.  By default this will be 'source.csv' 
-    # but should be specifiable on the command line.
+    # but it is also specifiable on the command line.
 
     with open(mySourceFile , "r" , newline='') as sourcefile:
         sourceReader = csv.reader(sourcefile)
@@ -133,12 +132,14 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
 
         # Next, open the destination file.  Having all of these files 
         # open at once ensures that we break on missing or misnamed files 
-        # right away, and lets use read and write only one file at a 
-        # time, keeping the memory needs very low and the number of times 
-        # we loop through the source file to one.
+        # right away, and lets us read and write only one file at a time, 
+        # keeping the memory needs very low and the number of times we loop 
+        # through the source file to one.
 
         # Use datetime.now() to give the output file a name unique to a 
-        # given minute.
+        # given minute.  These files are set to "append", so if you run it 
+        # more than once in a minute you'll get duplicate rows, but you won't 
+        # clobber (overwrite) your file, possibly causing data loss.
         myDateTimeString = datetime.datetime.now().strftime("%Y%m%d%H%M")
 
         with open(myDateTimeString + "tidyData.csv" , "a+" , newline='') as outputfile:
@@ -146,7 +147,7 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
             processedOutput = csv.writer(outputfile)
             # Finally, we create a file for rows that are outliers in some way.
 
-            with open(myDateTimeString + "outliers.csv" , "w+" , newline='') as outlierfile:
+            with open(myDateTimeString + "outliers.csv" , "a+" , newline='') as outlierfile:
                 # Create a csv object for the outliers
                 myOutliers = csv.writer(outlierfile)
                 
@@ -155,25 +156,26 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                 
                 newHeader = [parameterDataframe.at['New Name',i] if pandas.notnull(parameterDataframe.at['New Name',i]) else i for i in header]
                 #print(header)
-
+                
+                # Write the header to the output file
                 processedOutput.writerow(newHeader)
+                
                 for row in sourceReader:
                     # We need to put the changed values into a new row.
                     # Here's the list for that:
                     updatedRow = []
-                    # Set a flag for catching errors.  We can set this 
-                    # lots of times, because any value over zero 
-                    # triggers putting this row into the outliers file.
-                    is_wrong_somehow = 0
+                    # Set a flag for catching errors.  We can set this lots 
+                    # of times, because any value over zero triggers putting 
+                    # this row into the outliers file.
+                    isWrongSomehow = 0
                     
                     for i in range(len(row)):
-                        # Here is where we do all of the data validation
-                        # and reformatting.
+                        # Here is where we do all of the data validation and 
+                        # reformatting.
 
-                        #Set a cell variable equal to the cell we pull 
-                        # from the source data, so that manipulate (or 
-                        # not) that value and put it into our temporary 
-                        # row
+                        # Set a cell variable equal to the cell we pull 
+                        # from the source data, so that we manipulate (or 
+                        # not) that value and put it into our temporary row
 
                         cell = row[i]
 
@@ -181,17 +183,17 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                             # Canary here for number
                             #print("this is a number")
                             
-                            # Now we send the number and the format information to checkNumber()
+                            # Now we send the number and the format information to number_check()
                             checkedNumber = number_check(cell, parameterDataframe.at['Base Format' , header[i]], parameterDataframe.at['Desired Format' , header[i]])
                             if checkedNumber == "Failed isdigit error":
                                 #print("Error in number format: " + cell)
-                                is_wrong_somehow = is_wrong_somehow +1
+                                isWrongSomehow = isWrongSomehow +1
                             elif checkedNumber == "Base format error":
                                 #print("Error in number format: " + cell)
-                                is_wrong_somehow = is_wrong_somehow +1
+                                isWrongSomehow = isWrongSomehow +1
                             elif checkedNumber == "Desired format error":
                                 #print("Error in number format: " + cell)
-                                is_wrong_somehow = is_wrong_somehow +1
+                                isWrongSomehow = isWrongSomehow +1
                             else:
                                 cell = checkedNumber
                                 
@@ -202,7 +204,7 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                                         pass
                                     else:
                                         #print("Error in string format: " + cell)
-                                        is_wrong_somehow = is_wrong_somehow +1
+                                        isWrongSomehow = isWrongSomehow +1
                                 except:
                                     pass
                             elif parameterDataframe.at['Desired Format' , header[i]]:
@@ -211,7 +213,7 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                                         pass
                                     else:
                                         #print("Error in string format: " + cell)
-                                        is_wrong_somehow = is_wrong_somehow +1
+                                        isWrongSomehow = isWrongSomehow +1
                                 except:
                                     pass
                             else:
@@ -221,18 +223,18 @@ with open(myParameterFile , "r" , newline='') as parametersfile:
                             checkedDate = date_check(cell , parameterDataframe.at['Base Format' , header[i]] , parameterDataframe.at['Desired Format' , header[i]])
                             if checkedDate == "Date error":
                                 #print("Error in date format: " + cell)
-                                is_wrong_somehow = is_wrong_somehow +1
+                                isWrongSomehow = isWrongSomehow +1
                             else:
                                 cell = checkedDate
                         else:
                             print("This cell fell through the cracks all the way to the bottom: " + cell)
-                            is_wrong_somehow = is_wrong_somehow + 1
+                            isWrongSomehow = isWrongSomehow + 1
 
                         updatedRow.append(cell)
                     
                     # check the error flag value, and write out the row to
                     # either the outliers file or the output file.
-                    if (is_wrong_somehow > 0):
+                    if (isWrongSomehow > 0):
                         myOutliers.writerow(row)
                     else:
                         processedOutput.writerow(updatedRow)
