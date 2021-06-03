@@ -39,6 +39,9 @@ if len(sys.argv) == 3:
     myParameterFile = sys.argv[2]
 else:
     # We want hard-coded values for testing, as a fall-back.
+    print("Using default values, 'source.csv' as the source file and 'parameters.csv' as the parameters (rules) file.\n \
+        To avoid this, use:\n \
+        DataTidy.py SOURCEFILE PARAMTERFILE")
     mySourceFile = "source.csv"
     myParameterFile = "parameters.csv"
 
