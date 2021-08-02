@@ -16,3 +16,7 @@ high-resolution measurements will make this approach unworkable."""
 
 import datetime
 
+def setIndex(dt, interval):
+    """We assume that dt is a datetime object.  The interval is one of 
+    "y,m,d,M,s", for year, month, day, minute, or second."""
+    return myindex
