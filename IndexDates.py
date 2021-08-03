@@ -54,13 +54,15 @@ count = 0
 for a in bigarray:
     count = count + 1
     if len(a) != 24:
-        diffarray.append([a , "nan"])
+        diffarray.append([a , "oopsie"])
         # print("Line " + str(count) + ": [" + a + "]")
     else:
-        diffarray.append([a , datetime.datetime.strptime(a[:-5] , "%Y-%m-%d %H:%M:%S") - myindex])
+        difference = datetime.datetime.strptime(a[:-5] , "%Y-%m-%d %H:%M:%S") - myindex
+        
+        diffarray.append([a[:-1] , difference.total_seconds])
 
 print(len(diffarray))
 
-with open("output.csv") as out:
+with open("blah.csv" , "w") as out:
     csvwriter = csv.writer(out, delimiter=",")
     csvwriter.writerows(diffarray)
