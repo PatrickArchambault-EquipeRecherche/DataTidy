@@ -1,6 +1,7 @@
 # Ignore output files
 [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]*
 datetimes.csv
+output.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

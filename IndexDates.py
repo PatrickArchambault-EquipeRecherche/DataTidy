@@ -1,13 +1,13 @@
 #!/usr/bin/python
 
 """This is a utility program to help anonymize dates within a dataset.  The 
-concept is that the relationships between events in a clinical trial is 
+concept is that the relationships between events in a clinical trial are 
 important, but it creates an opportunity for patient re-identification if 
 correlated with external data that includes dates and times.  This tool finds 
-the earliest time in a CSV file and sets it to be equal to 1, and then 
-references all of the other times based on that index time.  This retains the 
-relationships between events without pinning that timeline to a specific date 
-and time that can be used to re-identify patients.
+the earliest time in a CSV file and then references all of the other times 
+based on that index time.  This retains the relationships between events 
+without pinning that timeline to a specific date and time that can be used 
+to re-identify patients.
 
 NOTE: This is brittle, in that any time that is disambiguated will then expose 
 the entire timeline.  Because of this, a 'fuzz' factor is specified, creating 
@@ -15,8 +15,52 @@ a random noise parameter for each value.  Please note that long periods of
 high-resolution measurements will make this approach unworkable."""
 
 import datetime
+import csv
 
-def setIndex(dt, interval):
-    """We assume that dt is a datetime object.  The interval is one of 
-    "y,m,d,M,s", for year, month, day, minute, or second."""
-    return myindex
+# This is an example from a recent project, to test string parsing, index
+# creation, etc.
+
+example_string_1 = "2021-02-08 20:29:00.000"
+example_string_2 = "2021-02-08 20:30:00.000"
+# The milliseconds are never present, and they need reformatting to match the 
+# %f in the datetime module, which is microseconds (zero-padded millionths of 
+# a second, so 000000, 000001, etc.)
+#print(example_string[:-4])
+example_dt_1 = datetime.datetime.strptime(example_string_1[:-4] , "%Y-%m-%d %H:%M:%S")
+example_dt_2 = datetime.datetime.strptime(example_string_2[:-4] , "%Y-%m-%d %H:%M:%S")
+#print(example_dt)
+myarray = [example_dt_1,example_dt_2]
+print(sorted(myarray))
+
+for a in myarray:
+    print(a - myarray[0])
+    print(datetime.timedelta.total_seconds(a - myarray[0]))
+
+bigarray = []
+with open("datetimes.csv") as csvdata:
+    bigarray = csvdata.readlines()
+
+print(len(bigarray))
+
+bigarray = sorted(bigarray)
+
+diffarray = []
+
+print(bigarray[0])
+print(bigarray[0][:-5])
+myindex = datetime.datetime.strptime(bigarray[0][:-5] , "%Y-%m-%d %H:%M:%S")
+print(myindex)
+count = 0
+for a in bigarray:
+    count = count + 1
+    if len(a) != 24:
+        diffarray.append([a , "nan"])
+        # print("Line " + str(count) + ": [" + a + "]")
+    else:
+        diffarray.append([a , datetime.datetime.strptime(a[:-5] , "%Y-%m-%d %H:%M:%S") - myindex])
+
+print(len(diffarray))
+
+with open("output.csv") as out:
+    csvwriter = csv.writer(out, delimiter=",")
+    csvwriter.writerows(diffarray)
