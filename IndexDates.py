@@ -15,56 +15,34 @@ a random noise parameter for each value.  Please note that long periods of
 high-resolution measurements will make this approach unworkable."""
 
 import datetime
-import csv
+import random
 
-# This is an example from a recent project, to test string parsing, index
-# creation, etc.
-
-example_string_1 = "2021-02-08 20:29:00.000"
-example_string_2 = "2021-02-08 20:30:00.000"
-# The milliseconds are never present, and they need reformatting to match the 
-# %f in the datetime module, which is microseconds (zero-padded millionths of 
-# a second, so 000000, 000001, etc.)
-#print(example_string[:-4])
-example_dt_1 = datetime.datetime.strptime(example_string_1[:-4] , "%Y-%m-%d %H:%M:%S")
-example_dt_2 = datetime.datetime.strptime(example_string_2[:-4] , "%Y-%m-%d %H:%M:%S")
-#print(example_dt)
-myarray = [example_dt_1,example_dt_2]
-print(sorted(myarray))
-
-for a in myarray:
-    print(a - myarray[0])
-    print(datetime.timedelta.total_seconds(a - myarray[0]))
-
-bigarray = []
-with open("datetimes.csv") as csvdata:
-    bigarray = csvdata.readlines()
-
-print(len(bigarray))
-
-bigarray = sorted(bigarray)
-
-diffarray = []
-
-print(bigarray[0])
-print(bigarray[0][:-5])
-myindex = datetime.datetime.strptime(bigarray[0][:-5] , "%Y-%m-%d %H:%M:%S")
-print(myindex)
-count = 0
-for a in bigarray:
-    count = count + 1
-    if len(a) != 24:
-        diffarray.append([a , "oopsie"])
-        # print("Line " + str(count) + ": [" + a + "]")
+def interval(indexDateTime , targetDateTime , fuzzFactor):
+    """Provide a datetime object for the index time, the time that needs the 
+    interval after the index time measures (again, as a Python datetime 
+    object), and a fuzz factor in seconds, which will be an integer defining 
+    the size of the fuzzing window, in seconds."""
+    intervalDays = 0
+    intervalHours = 0
+    intervalMinutes = 0
+    intervalSeconds = 0
+    ff = random.randint(0 , fuzzFactor)
+    intervalSeconds = datetime.timedelta.total_seconds\
+        (targetDateTime - indexDateTime) + ff
+    # Here we also generate, selectively, appropriate other measures
+    if (intervalSeconds > 60):
+        intervalMinutes = intervalSeconds / 60
     else:
-        difference = datetime.timedelta.total_seconds(datetime.datetime.strptime(a[:-5] , "%Y-%m-%d %H:%M:%S") - myindex)
-        
-        diffarray.append([a[:-1] , difference, difference / 60, difference / (60 * 60), difference / (60 * 60 * 24)])
+        intervalMinutes = 0
+    if (intervalSeconds > 60 * 60):
+        intervalHours = intervalSeconds / 60 / 60
+    else:
+        intervalHours = 0
+    if (intervalSeconds > 60 * 60 * 24):
+        intervalDays = intervalSeconds / 60 / 60 / 24
+    else:
+        intervalDays = 0
 
-print(len(diffarray))
+    i = (intervalDays , intervalHours , intervalMinutes, intervalSeconds)
+    return i
 
-with open("blah.csv" , "w+") as out:
-    csvwriter = csv.writer(out, delimiter=",")
-    header = ["datetime","seconds","minutes","hours","days"]
-    csvwriter.writerow(header)
-    csvwriter.writerows(diffarray)
